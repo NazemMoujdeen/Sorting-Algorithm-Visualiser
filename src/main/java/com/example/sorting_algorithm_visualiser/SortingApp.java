@@ -23,7 +23,7 @@ import java.util.Random;
 
 public class SortingApp extends Application {
 
-    private static final int WINDOW_WIDTH = 1100;
+    private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 700;
     private static final int ARRAY_SIZE = 100;
 
@@ -39,11 +39,16 @@ public class SortingApp extends Application {
         canvas.setStyle("-fx-background-color: black;"); // A dark background for the canvas
         root.setCenter(canvas);
 
+        // Perform the initial draw of the array by listing to what the slider says
+        canvas.heightProperty().addListener((obs, oldVal, newVal) -> {
+            drawArray();
+        });
         // Generate the first random array
         this.array = generateRandomArray(ARRAY_SIZE);
-        // Perform the initial draw of the array
-        drawArray();
 
+
+
+        //creates a hbox for all the setting buttons and sliders
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 10, 10, 10));
         hBox.setAlignment(Pos.CENTER);
@@ -53,6 +58,7 @@ public class SortingApp extends Application {
         String[] sortingAlgorithms = {"Bubble Sort", "Merge Sort"};
         ChoiceBox<String> choiceBox = new ChoiceBox<String>(FXCollections.observableArrayList(sortingAlgorithms));
 
+        //creates a speed slider to adjust the speed at which the bars are sorted
         Slider speedSlider = new Slider();
         Label speedLabel = new Label("Speed");
         speedSlider.setMin(0);
@@ -61,6 +67,7 @@ public class SortingApp extends Application {
         speedSlider.setPrefWidth(150);
         speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {});
 
+        //creates an array size slider to adjust how many bars there are
         Slider arraySizeSlider = new Slider();
         Label arraySizeLabel = new Label("Array Size");
         arraySizeSlider.setMin(2);
@@ -83,7 +90,7 @@ public class SortingApp extends Application {
             this.array = generateRandomArray(newSize);
             drawArray();});
 
-
+        //adds all the settings to the hbox
         hBox.getChildren().addAll(
                 resetButton, startButton, choiceBox,
                 arraySizeLabel, arraySizeSlider,
@@ -110,6 +117,7 @@ public class SortingApp extends Application {
     private void drawArray() {
         canvas.getChildren().clear(); //removes previous bars
         double barWidth = (double) WINDOW_WIDTH / array.length;
+        double canvasHeight = canvas.getHeight();
 
         for (int i = 0; i < array.length; i++) {
             int value = array[i];
@@ -119,7 +127,7 @@ public class SortingApp extends Application {
             // X position is based on the index and bar width
             bar.setX(i * barWidth);
             // Y position is calculated from the bottom of the canvas
-            bar.setY(WINDOW_HEIGHT - value);
+            bar.setY(canvasHeight - value);
             bar.setWidth(barWidth - 1); // Subtract 1 to create a small gap between bars
             bar.setHeight(value);
 
