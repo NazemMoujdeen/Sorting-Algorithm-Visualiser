@@ -1,6 +1,12 @@
 package com.example.sorting_algorithm_visualiser;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -8,6 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
 
 import java.io.IOException;
@@ -15,8 +23,8 @@ import java.util.Random;
 
 public class SortingApp extends Application {
 
-    private static final int WINDOW_WIDTH = 1000;
-    private static final int WINDOW_HEIGHT = 600;
+    private static final int WINDOW_WIDTH = 1100;
+    private static final int WINDOW_HEIGHT = 700;
     private static final int ARRAY_SIZE = 100;
 
     private int[] array;
@@ -26,18 +34,64 @@ public class SortingApp extends Application {
     public void start(Stage stage) throws IOException {
         BorderPane root = new BorderPane();
 
-        // Initialize the canvas where the bars will be drawn
+        // create the canvas where the bars will be drawn
         canvas = new Pane();
         canvas.setStyle("-fx-background-color: black;"); // A dark background for the canvas
         root.setCenter(canvas);
 
         // Generate the first random array
         this.array = generateRandomArray(ARRAY_SIZE);
-
         // Perform the initial draw of the array
         drawArray();
 
-        // --- Standard JavaFX Scene and Stage setup ---
+        HBox hBox = new HBox();
+        hBox.setPadding(new Insets(10, 10, 10, 10));
+        hBox.setAlignment(Pos.CENTER);
+        hBox.setSpacing(40);
+        root.setTop(hBox);
+
+        String[] sortingAlgorithms = {"Bubble Sort", "Merge Sort"};
+        ChoiceBox<String> choiceBox = new ChoiceBox<String>(FXCollections.observableArrayList(sortingAlgorithms));
+
+        Slider speedSlider = new Slider();
+        Label speedLabel = new Label("Speed");
+        speedSlider.setMin(0);
+        speedSlider.setMax(100);
+        speedSlider.setValue(50);
+        speedSlider.setPrefWidth(150);
+        speedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {});
+
+        Slider arraySizeSlider = new Slider();
+        Label arraySizeLabel = new Label("Array Size");
+        arraySizeSlider.setMin(2);
+        arraySizeSlider.setMax(ARRAY_SIZE);
+        arraySizeSlider.setValue(10);
+        arraySizeSlider.setPrefWidth(150);
+        arraySizeSlider.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (!isChanging) { // If the user has released the mouse
+                // Get the new size, cast to int, generate new array, and draw it
+                int newSize = (int) arraySizeSlider.getValue();
+                this.array = generateRandomArray(newSize);
+                drawArray();
+            }
+        });
+
+        Button startButton = new Button("Sort");
+        Button resetButton = new Button("Reset");
+        resetButton.setOnAction(event -> {
+            int newSize = (int) arraySizeSlider.getValue();
+            this.array = generateRandomArray(newSize);
+            drawArray();});
+
+
+        hBox.getChildren().addAll(
+                resetButton, startButton, choiceBox,
+                arraySizeLabel, arraySizeSlider,
+                speedLabel, speedSlider
+        );
+
+
+
         Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
         stage.setTitle("Sorting Algorithm Visualizer");
         stage.setScene(scene);
